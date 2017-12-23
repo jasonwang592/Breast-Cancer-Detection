@@ -10,6 +10,7 @@ import numpy as np
 def cum_variance_explained(df, output_dir, save = True):
   '''Generates the cumulative variance explained plot for PCA based on number of components
   equal to the number of features
+
   Args:
     - df        (DataFrame): The dataframe all data (malignant and benign)
     - output_dir(String)   : The directory to save output to for bivariate_kde plots
