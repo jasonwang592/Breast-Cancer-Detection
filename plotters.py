@@ -3,6 +3,33 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import sys
+from sklearn.decomposition import PCA
+import numpy as np
+
+
+def cum_variance_explained(df, output_dir, save = True):
+  '''Generates the cumulative variance explained plot for PCA based on number of components
+  equal to the number of features
+  Args:
+    - df        (DataFrame): The dataframe all data (malignant and benign)
+    - output_dir(String)   : The directory to save output to for bivariate_kde plots
+    - save      (Boolean)  : Saves the file by default, if set to False, displays the plot instead
+  '''
+
+  pca = PCA(n_components = df.shape[1])
+  pca.fit(df)
+  var = pca.explained_variance_ratio_
+  cumsum = np.cumsum(np.round(pca.explained_variance_ratio_, decimals = 4) * 100)
+  plt.xlabel('Principal Components')
+  plt.ylabel('Percentage of Variance Explained')
+  plt.plot(cumsum)
+  if save:
+    if not os.path.exists(output_dir):
+      os.makedirs(output_dir)
+    plt.savefig(output_dir + ','.join(['PCA Cumulative Variance', str(df.shape[1]) + ' components']))
+  else:
+    plt.show()
+  plt.close()
 
 def pairplots(df, features, output_dir, save = True):
   '''Plots pairplots for the data frame and desired features to visualize.
@@ -14,9 +41,9 @@ def pairplots(df, features, output_dir, save = True):
     - save      (Boolean)  : Saves the file by default, if set to False, displays the plot instead
   '''
 
-  temp = df.loc[:, cols]
+  temp = df.loc[:, features]
   fname = ['pairplot']
-  for i in cols:
+  for i in features:
     if i != 'diagnosis':
       fname.append(i)
   sns.pairplot(data = temp, hue = 'diagnosis', palette = 'husl', diag_kind = 'kde')
@@ -24,7 +51,7 @@ def pairplots(df, features, output_dir, save = True):
   if save:
     if not os.path.exists(output_dir):
       os.makedirs(output_dir)
-    plt.savefig(output_dir + '_'.join([feature1, feature2]))
+    plt.savefig(output_dir + '+'.join(fname))
   else:
     plt.show()
   plt.close()
@@ -71,12 +98,13 @@ def bivariate_kde(df, feature1, feature2, output_dir, save = True):
     plt.show()
   plt.close()
 
-def violinplotter(df, output_dir, save = True):
+def violinplotter(df, labs, output_dir, save = True):
   '''Helper function to make pairwise violinplots with split turned on to quickly compare high level distributions
   of features in breast masses examined.
 
   Args:
     - df        (DataFrame): The dataframe all data (malignant and benign)
+    - labs      (DataFrame): DataFrame of labels
     - output_dir(String)   : The directory to save output to for violinplots
     - save      (Boolean)  : Saves the file by default, if set to False, displays the plot instead
 
