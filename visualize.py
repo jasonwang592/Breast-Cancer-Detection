@@ -19,10 +19,6 @@ labs = df['diagnosis']
 x = df.copy(deep = True)
 x.drop(['diagnosis'], axis = 1, inplace = True)
 
-#split train and test data
-train = df.sample(frac = 0.8, random_state = 123)
-test = df.loc[~df.index.isin(train.index)]
-
 #standardize the columns
 x = (x - x.mean()) / x.std()
 
