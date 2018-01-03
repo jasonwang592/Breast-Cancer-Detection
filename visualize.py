@@ -2,7 +2,6 @@ import seaborn as sns
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-import sys
 import plotters
 from sklearn.decomposition import PCA
 from tabulate import tabulate
@@ -28,20 +27,20 @@ plotters.violinplotter(x, labs,  output_dir)
 
 #Choose features of interest and plot pairplots
 output_dir = output + 'pairwiseplots/'
-cols = ['diagnosis', 'concavity_mean', 'concave points_mean', 'concave points_worst']
+cols = ['diagnosis', 'symmetry_mean', 'fractal_dimension_mean']
 plotters.pairplots(df, cols, output_dir)
 
 #Explore some bivariate KDE plots for like features
 plotters.bivariate_kde(df, 'concavity_mean', 'concave points_mean', output + 'kde_density_plots/')
 
-#Preliminary PCA
-plotters.cum_variance_explained(x, output + 'PCA/')
-
+output_dir = output + 'clustermaps/'
+if not os.path.exists(output_dir):
+  os.makedirs(output_dir)
 #Looking at clustermaps to see what features are highly correlated and can be dropped
 g = sns.clustermap(x.corr())
 plt.setp(g.ax_heatmap.get_yticklabels(), rotation = 0)
 plt.setp(g.ax_heatmap.get_xticklabels(), rotation = 90)
-plt.savefig('clustermap_original') #TODO: Figure out how to fix cutoff on this shiznit
+plt.savefig(output_dir + 'clustermap_original') #TODO: Figure out how to fix cutoff on this shiznit
 plt.close()
 
 x.drop(['perimeter_mean', 'radius_mean', 'perimeter_worst','radius_worst',
@@ -49,16 +48,19 @@ x.drop(['perimeter_mean', 'radius_mean', 'perimeter_worst','radius_worst',
 g = sns.clustermap(x.corr())
 plt.setp(g.ax_heatmap.get_yticklabels(), rotation = 0)
 plt.setp(g.ax_heatmap.get_xticklabels(), rotation = 90)
-plt.savefig('clustermap_drop1') #TODO: Figure out how to fix cutoff on this shiznit
+plt.savefig(output_dir + 'clustermap_drop1') #TODO: Figure out how to fix cutoff on this shiznit
 plt.close()
 
 x.drop(['compactness_se', 'concavity_se', 'concave points_se','symmetry_se',
-        'concavity_worst', 'compactness_worst', 'concave points_worst'], axis = 1, inplace = True)
+        'concavity_worst', 'compactness_worst', 'concave points_worst', 'texture_worst'], axis = 1, inplace = True)
 g = sns.clustermap(x.corr())
 plt.setp(g.ax_heatmap.get_yticklabels(), rotation = 0)
 plt.setp(g.ax_heatmap.get_xticklabels(), rotation = 90)
-plt.savefig('clustermap_drop2') #TODO: Figure out how to fix cutoff on this shiznit
+plt.savefig(output_dir + 'clustermap_drop2') #TODO: Figure out how to fix cutoff on this shiznit
 plt.close()
+
+#Preliminary PCA
+plotters.cum_variance_explained(x, output + 'PCA/')
 
 #PCA analysis post basic feature engineering
 plotters.cum_variance_explained(x, output + 'PCA/')

@@ -47,7 +47,9 @@ def pairplots(df, features, output_dir, save = True):
   for i in features:
     if i != 'diagnosis':
       fname.append(i)
-  sns.pairplot(data = temp, hue = 'diagnosis', palette = 'husl', diag_kind = 'kde')
+  g = sns.pairplot(data = temp, hue = 'diagnosis', palette = 'husl', diag_kind = 'kde')
+  g.fig.get_children()[-1].set_bbox_to_anchor((1.0, 0.5, 0, 0))
+
 
   if save:
     if not os.path.exists(output_dir):
